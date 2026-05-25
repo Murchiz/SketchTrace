@@ -242,7 +242,6 @@ fun TraceContent() {
 fun CameraPreview(modifier: Modifier = Modifier) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
-    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     
     AndroidView(
         factory = { ctx ->
@@ -251,6 +250,7 @@ fun CameraPreview(modifier: Modifier = Modifier) {
                 implementationMode = PreviewView.ImplementationMode.COMPATIBLE
             }
             
+            val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
             cameraProviderFuture.addListener({
                 try {
                     val cameraProvider = cameraProviderFuture.get()
@@ -275,20 +275,13 @@ fun CameraPreview(modifier: Modifier = Modifier) {
                             preview
                         )
                     }
-                } catch (exc: Exception) {
+                } catch (exc: Throwable) {
                     exc.printStackTrace()
                 }
-            }, ContextCompat.getMainExecutor(context))
+            }, ContextCompat.getMainExecutor(ctx))
             
             previewView
         },
-        modifier = modifier,
-        onRelease = {
-            try {
-                cameraProviderFuture.get().unbindAll()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        modifier = modifier
     )
 }
