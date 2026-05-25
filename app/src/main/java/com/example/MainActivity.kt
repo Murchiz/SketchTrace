@@ -246,13 +246,11 @@ fun CameraPreview(modifier: Modifier = Modifier) {
     
     AndroidView(
         factory = { ctx ->
-            PreviewView(ctx).apply {
+            val previewView = PreviewView(ctx).apply {
                 scaleType = PreviewView.ScaleType.FILL_CENTER
                 implementationMode = PreviewView.ImplementationMode.COMPATIBLE
             }
-        },
-        modifier = modifier,
-        update = { previewView ->
+            
             cameraProviderFuture.addListener({
                 try {
                     val cameraProvider = cameraProviderFuture.get()
@@ -262,16 +260,18 @@ fun CameraPreview(modifier: Modifier = Modifier) {
 
                     cameraProvider.unbindAll()
                     
-                    if (cameraProvider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) {
-                        cameraProvider.bindToLifecycle(
-                            lifecycleOwner,
-                            CameraSelector.DEFAULT_BACK_CAMERA,
-                            preview
-                        )
+                    val cameraSelector = if (cameraProvider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) {
+                        CameraSelector.DEFAULT_BACK_CAMERA
                     } else if (cameraProvider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
+                        CameraSelector.DEFAULT_FRONT_CAMERA
+                    } else {
+                        null
+                    }
+                    
+                    if (cameraSelector != null) {
                         cameraProvider.bindToLifecycle(
                             lifecycleOwner,
-                            CameraSelector.DEFAULT_FRONT_CAMERA,
+                            cameraSelector,
                             preview
                         )
                     }
@@ -279,6 +279,16 @@ fun CameraPreview(modifier: Modifier = Modifier) {
                     exc.printStackTrace()
                 }
             }, ContextCompat.getMainExecutor(context))
+            
+            previewView
+        },
+        modifier = modifier,
+        onRelease = {
+            try {
+                cameraProviderFuture.get().unbindAll()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     )
 }
