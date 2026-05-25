@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
@@ -8,31 +11,41 @@ plugins {
 
 android {
   namespace = "com.example"
-  compileSdk { version = release(36) { minorApiLevel = 1 } }
+  compileSdk {
+    version = release(37)
+  }
 
   defaultConfig {
-    applicationId = "com.example"
-    minSdk = 24
+    applicationId = "com.murchiz.sketchtrace"
+    minSdk = 31
     targetSdk = 36
     versionCode = 1
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    proguardFiles()
   }
 
   signingConfigs {
-    create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
-      storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
+    getByName("debug") {
+      storeFile = file("${rootDir}/key.jks")
+      storePassword = "***REMOVED***"
       keyAlias = "upload"
-      keyPassword = System.getenv("KEY_PASSWORD")
+      keyPassword = "***REMOVED***"
     }
-    create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
-      storePassword = "android"
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
+    // Read the safe local.properties file
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+      localProperties.load(FileInputStream(localPropertiesFile))
+    }
+
+    create("release") {
+      storeFile = file("${rootDir}/key.jks")
+      keyAlias = "upload"
+      // It will try local.properties first, then fallback to environment variables
+      storePassword = localProperties.getProperty("STORE_PASSWORD") ?: System.getenv("STORE_PASSWORD")
+      keyPassword = localProperties.getProperty("KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
     }
   }
 
@@ -44,7 +57,6 @@ android {
       signingConfig = signingConfigs.getByName("release")
     }
     debug {
-      signingConfig = signingConfigs.getByName("debugConfig")
     }
   }
   compileOptions {
@@ -56,6 +68,7 @@ android {
     buildConfig = true
   }
   testOptions { unitTests { isIncludeAndroidResources = true } }
+  buildToolsVersion = "37.0.0"
 }
 
 // Configure the Secrets Gradle Plugin to use .env and .env.example files

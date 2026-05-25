@@ -241,7 +241,7 @@ fun TraceContent() {
 @Composable
 fun CameraPreview(modifier: Modifier = Modifier) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val context = LocalContext.current
+    LocalContext.current
     
     AndroidView(
         factory = { ctx ->
@@ -255,7 +255,7 @@ fun CameraPreview(modifier: Modifier = Modifier) {
                 try {
                     val cameraProvider = cameraProviderFuture.get()
                     val preview = CameraPreviewSpec.Builder().build().also {
-                        it.setSurfaceProvider(previewView.surfaceProvider)
+                        it.surfaceProvider = previewView.surfaceProvider
                     }
 
                     cameraProvider.unbindAll()
