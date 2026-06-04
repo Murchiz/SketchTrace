@@ -1,21 +1,41 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+## Prerequisites
 
-# Run and deploy your AI Studio app
+- Android Studio (Ladybug or newer recommended)
+- JDK 17+
+- Android SDK with compileSdk 37
 
-This contains everything you need to run your app locally.
+## Setup
 
-View your app in AI Studio: https://ai.studio/apps/10e89c72-77de-4f0d-acbc-7262ca421ccb
+```bash
+# Copy the example env file and fill in your values
+cp .env.example .env
+```
 
-## Run Locally
+Add your `GEMINI_API_KEY` to `.env` (loaded by the Secrets Gradle Plugin).
 
-**Prerequisites:**  [Android Studio](https://developer.android.com/studio)
+> **Note:** The signing block in `app/build.gradle.kts` reads `STORE_PASSWORD` and `KEY_PASSWORD` from environment variables (set in `.env` or your shell) — never commit those values.
 
+## Build
 
-1. Open Android Studio
-2. Select **Open** and choose the directory containing this project
-3. Allow Android Studio to fix any incompatibilities as it imports the project.
-4. Create a file named `.env` in the project directory and set `GEMINI_API_KEY` in that file to your Gemini API key (see `.env.example` for an example)
-5. Remove this line from the app's `build.gradle.kts` file: `signingConfig = signingConfigs.getByName("debugConfig")`
-6. Run the app on an emulator or physical device
+```bash
+./gradlew assembleDebug   # debug APK
+./gradlew assembleRelease # release APK (requires signing config)
+```
+
+## Project
+
+- **Language:** Kotlin + Jetpack Compose
+- **Min SDK:** 31 (Android 12)
+- **Target SDK:** 36
+- **Camera:** CameraX (Camera2 core)
+- **Networking:** Retrofit + Moshi
+- **Local storage:** Room
+- **Image loading:** Coil
+
+## Screenshots
+
+_(Coming soon)_
+
+## License
+
+See [LICENSE](LICENSE).

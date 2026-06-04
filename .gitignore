@@ -1,24 +1,38 @@
+# Android/IDE
 *.iml
 .gradle
 .kotlin
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+*.log
+*.tmp
+
+# Environment variables & secrets
 .env
+.env.example
+.env.*.local
+
+# Keystores & signing
+local.properties
 debug.keystore
 *.jks
 *.keystore
+debug.keystore.base64
+key.jks
+
+# Build outputs
 app/release/
 app/build/
 /build/
 .idea/
+.antigravitycli

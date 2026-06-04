@@ -27,26 +27,34 @@ android {
   }
 
   signingConfigs {
-    getByName("debug") {
-      storeFile = file("${rootDir}/key.jks")
-      storePassword = "***REMOVED***"
-      keyAlias = "upload"
-      keyPassword = "***REMOVED***"
-    }
-    // Read the safe local.properties file
-    val localProperties = Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-      localProperties.load(FileInputStream(localPropertiesFile))
-    }
+      // All signing credentials are loaded from environment variables.
+      // Do NOT hardcode passwords here.
+      // Set STORE_PASSWORD and KEY_PASSWORD in .env or your shell environment.
+      getByName("debug") {
+          keyAlias = "upload"
+          storeFile = file("${rootDir}/key.jks")
+          storePassword = System.getenv("STORE_PASSWORD")
+              ?: rootProject.findProperty("STORE_PASSWORD") as? String
+          keyPassword = System.getenv("KEY_PASSWORD")
+              ?: rootProject.findProperty("KEY_PASSWORD") as? String
+      }
 
-    create("release") {
-      storeFile = file("${rootDir}/key.jks")
-      keyAlias = "upload"
-      // It will try local.properties first, then fallback to environment variables
-      storePassword = localProperties.getProperty("STORE_PASSWORD") ?: System.getenv("STORE_PASSWORD")
-      keyPassword = localProperties.getProperty("KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
-    }
+      val localProperties = Properties()
+      val localPropertiesFile = rootProject.file("local.properties")
+      if (localPropertiesFile.exists()) {
+          FileInputStream(localPropertiesFile).use { localProperties.load(it) }
+      }
+
+      create("release") {
+          storeFile = file("${rootDir}/key.jks")
+          keyAlias = "upload"
+          storePassword = System.getenv("STORE_PASSWORD")
+              ?: localProperties.getProperty("STORE_PASSWORD")
+              ?: rootProject.findProperty("STORE_PASSWORD") as? String
+          keyPassword = System.getenv("KEY_PASSWORD")
+              ?: localProperties.getProperty("KEY_PASSWORD")
+              ?: rootProject.findProperty("KEY_PASSWORD") as? String
+      }
   }
 
   buildTypes {
