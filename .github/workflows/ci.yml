@@ -12,6 +12,11 @@ on:
         required: true
         type: boolean
         default: false
+      version:
+        description: 'Release version (e.g. v1.0.0, defaults to v1.0.<run_number>)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -61,6 +66,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Determine Version Tag
+        id: version
+        run: |
+          TAG="${{ inputs.version }}"
+          if [ -z "$TAG" ]; then
+            TAG="v1.0.${{ github.run_number }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
       - name: Decode Keystore
         if: ${{ env.KEYSTORE_BASE64 != '' }}
         env:
@@ -76,8 +90,9 @@ jobs:
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: Release v1.0.${{ github.run_number }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           draft: false
           prerelease: false
           files: app/build/outputs/apk/release/*.apk
