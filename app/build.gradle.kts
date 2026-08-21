@@ -27,33 +27,35 @@ android {
   }
 
   signingConfigs {
-      // All signing credentials are loaded from environment variables.
+      // All signing credentials are loaded from environment variables or local.properties.
       // Do NOT hardcode passwords here.
-      // Set STORE_PASSWORD and KEY_PASSWORD in .env or your shell environment.
-      getByName("debug") {
-          keyAlias = "upload"
-          storeFile = file("${rootDir}/key.jks")
-          storePassword = System.getenv("STORE_PASSWORD")
-              ?: rootProject.findProperty("STORE_PASSWORD") as? String
-          keyPassword = System.getenv("KEY_PASSWORD")
-              ?: rootProject.findProperty("KEY_PASSWORD") as? String
-      }
-
       val localProperties = Properties()
       val localPropertiesFile = rootProject.file("local.properties")
       if (localPropertiesFile.exists()) {
           FileInputStream(localPropertiesFile).use { localProperties.load(it) }
       }
 
+      val storePwd = System.getenv("STORE_PASSWORD")
+          ?: localProperties.getProperty("STORE_PASSWORD")
+          ?: rootProject.findProperty("STORE_PASSWORD") as? String
+      val keyPwd = System.getenv("KEY_PASSWORD")
+          ?: localProperties.getProperty("KEY_PASSWORD")
+          ?: rootProject.findProperty("KEY_PASSWORD") as? String
+
+      if (storePwd != null && keyPwd != null) {
+          getByName("debug") {
+              keyAlias = "upload"
+              storeFile = file("${rootDir}/key.jks")
+              storePassword = storePwd
+              keyPassword = keyPwd
+          }
+      }
+
       create("release") {
           storeFile = file("${rootDir}/key.jks")
           keyAlias = "upload"
-          storePassword = System.getenv("STORE_PASSWORD")
-              ?: localProperties.getProperty("STORE_PASSWORD")
-              ?: rootProject.findProperty("STORE_PASSWORD") as? String
-          keyPassword = System.getenv("KEY_PASSWORD")
-              ?: localProperties.getProperty("KEY_PASSWORD")
-              ?: rootProject.findProperty("KEY_PASSWORD") as? String
+          storePassword = storePwd
+          keyPassword = keyPwd
       }
   }
 
@@ -70,6 +72,9 @@ android {
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+  }
+  kotlin {
+    jvmToolchain(17)
   }
   buildFeatures {
     compose = true
@@ -89,6 +94,11 @@ secrets {
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
+  constraints {
+    implementation(libs.netty.codec.http) {
+      because("Update io.netty:netty-codec-http to 4.1.137.Final")
+    }
+  }
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
   implementation(libs.accompanist.permissions)

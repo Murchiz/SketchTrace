@@ -35,8 +35,10 @@ robolectric = "4.16.1"
 roborazzi = "1.63.0"
 firebaseBom = "34.13.0"
 secretsGradlePlugin = "2.0.1"
+nettyCodecHttp = "4.1.137.Final"
 
 [libraries]
+netty-codec-http = { group = "io.netty", name = "netty-codec-http", version.ref = "nettyCodecHttp" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
