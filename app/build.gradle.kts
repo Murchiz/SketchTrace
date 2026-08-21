@@ -42,20 +42,22 @@ android {
           ?: localProperties.getProperty("KEY_PASSWORD")
           ?: rootProject.findProperty("KEY_PASSWORD") as? String
 
-      if (storePwd != null && keyPwd != null) {
+      val keystoreFile = file("${rootDir}/key.jks")
+
+      if (keystoreFile.exists() && storePwd != null && keyPwd != null) {
           getByName("debug") {
               keyAlias = "upload"
-              storeFile = file("${rootDir}/key.jks")
+              storeFile = keystoreFile
               storePassword = storePwd
               keyPassword = keyPwd
           }
-      }
 
-      create("release") {
-          storeFile = file("${rootDir}/key.jks")
-          keyAlias = "upload"
-          storePassword = storePwd
-          keyPassword = keyPwd
+          create("release") {
+              storeFile = keystoreFile
+              keyAlias = "upload"
+              storePassword = storePwd
+              keyPassword = keyPwd
+          }
       }
   }
 
@@ -64,7 +66,9 @@ android {
       isCrunchPngs = false
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      signingConfig = signingConfigs.getByName("release")
+      signingConfigs.findByName("release")?.let {
+          signingConfig = it
+      }
     }
     debug {
     }
