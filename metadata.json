@@ -2,5 +2,5 @@
   "name": "Sketch Trace",
   "description": "Overlay transparent images on the camera for easy tracing and sketching.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

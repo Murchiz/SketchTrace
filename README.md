@@ -6,14 +6,7 @@
 
 ## Setup
 
-```bash
-# Copy the example env file and fill in your values
-cp .env.example .env
-```
-
-Add your `GEMINI_API_KEY` to `.env` (loaded by the Secrets Gradle Plugin).
-
-> **Note:** The signing block in `app/build.gradle.kts` reads `STORE_PASSWORD` and `KEY_PASSWORD` from environment variables (set in `.env` or your shell) — never commit those values.
+> **Note:** The signing block in `app/build.gradle.kts` reads `STORE_PASSWORD` and `KEY_PASSWORD` from environment variables (or `local.properties`) — never commit those values.
 
 ## Build
 
@@ -28,7 +21,6 @@ Add your `GEMINI_API_KEY` to `.env` (loaded by the Secrets Gradle Plugin).
 - **Min SDK:** 31 (Android 12)
 - **Target SDK:** 36
 - **Camera:** CameraX (Camera2 core)
-- **Networking:** Retrofit + Moshi
 - **Local storage:** Room
 - **Image loading:** Coil
 
