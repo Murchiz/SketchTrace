@@ -21,7 +21,6 @@
 - **Min SDK:** 31 (Android 12)
 - **Target SDK:** 36
 - **Camera:** CameraX (Camera2 core)
-- **Local storage:** Room
 - **Image loading:** Coil
 
 ## Screenshots
